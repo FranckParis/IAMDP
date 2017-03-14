@@ -129,12 +129,35 @@ public class ValueIterationAgent extends PlanningValueAgent{
 	@Override
 	public List<Action> getPolitique(Etat _e) {
 
+		List<Action> returnactions = new ArrayList<Action>();
 
-		
+		Double max = 0.0;
+		Action amax = null;
+
+		for (Action a : mdp.getActionsPossibles(_e)){
+			try {
+				Map<Etat, Double> spmap = mdp.getEtatTransitionProba(_e, a);
+				Double sum = 0.0;
+				for(Map.Entry<Etat, Double> entry : spmap.entrySet()){
+					sum += entry.getValue()*(mdp.getRecompense(_e, a, entry.getKey())+gamma*V.get(entry.getKey()));
+				}
+				if(sum > max){
+					max = sum;
+					amax = a;
+				}
+				max = Math.max(sum, max);
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+		}
+		returnactions.add(amax);
+
+		//Liste un seul élément ?
+
+
 		// retourne action de meilleure valeur dans _e selon V, 
 		// retourne liste vide si aucune action legale (etat absorbant)
-		List<Action> returnactions = new ArrayList<Action>();
-	
+
 		return returnactions;
 		
 	}
