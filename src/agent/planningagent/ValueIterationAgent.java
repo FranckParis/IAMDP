@@ -130,9 +130,7 @@ public class ValueIterationAgent extends PlanningValueAgent{
 	public List<Action> getPolitique(Etat _e) {
 
 		List<Action> returnactions = new ArrayList<Action>();
-
 		Double max = 0.0;
-		Action amax = null;
 
 		for (Action a : mdp.getActionsPossibles(_e)){
 			try {
@@ -141,16 +139,20 @@ public class ValueIterationAgent extends PlanningValueAgent{
 				for(Map.Entry<Etat, Double> entry : spmap.entrySet()){
 					sum += entry.getValue()*(mdp.getRecompense(_e, a, entry.getKey())+gamma*V.get(entry.getKey()));
 				}
-				if(sum > max){
-					max = sum;
-					amax = a;
+				if(sum >= max){
+					if(sum.equals(max)){
+						returnactions.add(a);
+					}
+					else {
+						max = sum;
+						returnactions.clear();
+						returnactions.add(a);
+					}
 				}
-				max = Math.max(sum, max);
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
 		}
-		returnactions.add(amax);
 
 		//Liste un seul élément ?
 
