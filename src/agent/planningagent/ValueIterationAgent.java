@@ -75,7 +75,7 @@ public class ValueIterationAgent extends PlanningValueAgent{
 		HashMap<Etat, Double> v = new HashMap<>();
 
 		for (Etat e : mdp.getEtatsAccessibles()){
-			Double max = 0.0;
+			Double max = -Double.MAX_VALUE;
 			for (Action a : mdp.getActionsPossibles(e)){
 				try {
 					Map<Etat, Double> spmap = mdp.getEtatTransitionProba(e, a);
@@ -88,8 +88,17 @@ public class ValueIterationAgent extends PlanningValueAgent{
 					e1.printStackTrace();
 				}
 			}
-			v.put(e, max);
-			delta = Math.max(delta, Math.abs(V.get(e)-max));
+			//v.put(e, max);
+			//delta = Math.max(delta, Math.abs(V.get(e)-max));
+
+			if(this.mdp.estAbsorbant(e)) {
+				this.delta = Math.max(this.delta, Math.abs(0.0 - this.V.get(e)));
+				v.put(e, 0.0);
+			}
+			else {
+				this.delta = Math.max(this.delta, Math.abs(max - this.V.get(e)));
+				v.put(e, max);
+			}
 		}
 		V = v;
 		
@@ -130,7 +139,7 @@ public class ValueIterationAgent extends PlanningValueAgent{
 	public List<Action> getPolitique(Etat _e) {
 
 		List<Action> returnactions = new ArrayList<Action>();
-		Double max = 0.0;
+		Double max = -Double.MAX_VALUE;
 
 		for (Action a : mdp.getActionsPossibles(_e)){
 			try {
