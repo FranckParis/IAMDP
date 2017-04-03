@@ -2,7 +2,10 @@ package pacman.environnementRL;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 
+import com.sun.xml.internal.fastinfoset.tools.FI_StAX_SAX_Or_XML_SAX_SAXEvent;
+import pacman.elements.Position2D;
 import pacman.elements.StateAgentPacman;
 import pacman.elements.StateGamePacman;
 import environnement.Etat;
@@ -12,11 +15,39 @@ import environnement.Etat;
  */
 public class EtatPacmanMDPClassic implements Etat , Cloneable{
 
-	
+	private ArrayList<Position2D> ghosts;
+	private ArrayList<Position2D> dots;
+	private ArrayList<Position2D> pacmans;
+
 	public EtatPacmanMDPClassic(StateGamePacman _stategamepacman){
-	
-		
-		
+
+		//Pacman
+		this.pacmans = new ArrayList<>();
+		for (int i=0; i<_stategamepacman.getNumberOfPacmans();i++) {
+			if(!_stategamepacman.getPacmanState(i).isDead()){
+				this.pacmans.add(new Position2D(_stategamepacman.getPacmanState(i).getX(),
+						_stategamepacman.getPacmanState(i).getY()));
+			}
+		}
+
+		//Ghosts
+		this.ghosts = new ArrayList<>();
+		for (int i=0; i<_stategamepacman.getNumberOfGhosts();i++) {
+			if(!_stategamepacman.getGhostState(i).isDead()){
+				this.ghosts.add(new Position2D(_stategamepacman.getGhostState(i).getX(),
+						_stategamepacman.getGhostState(i).getY()));
+			}
+		}
+
+		//Dots
+		this.dots = new ArrayList<>();
+		for(int i =0; i<_stategamepacman.getMaze().getSizeX(); i++){
+			for(int j =0; j<_stategamepacman.getMaze().getSizeY(); j++){
+				if(_stategamepacman.getMaze().isFood(i, j)){
+					this.dots.add(new Position2D(i, j));
+				}
+			}
+		}
 	}
 	
 	@Override
@@ -45,7 +76,18 @@ public class EtatPacmanMDPClassic implements Etat , Cloneable{
 	}
 
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		EtatPacmanMDPClassic that = (EtatPacmanMDPClassic) o;
+		return Objects.equals(ghosts, that.ghosts) &&
+				Objects.equals(dots, that.dots) &&
+				Objects.equals(pacmans, that.pacmans);
+	}
 
-	
-
+	@Override
+	public int hashCode() {
+		return Objects.hash(ghosts, dots, pacmans);
+	}
 }
