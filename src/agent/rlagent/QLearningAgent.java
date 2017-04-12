@@ -3,6 +3,7 @@ package agent.rlagent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javafx.util.Pair;
 import environnement.Action;
@@ -56,29 +57,30 @@ public class QLearningAgent extends RLAgent {
 		if (this.getActionsLegales(e).size() == 0){//etat  absorbant; impossible de le verifier via environnement
 			System.out.println("aucune action legale");
 			return new ArrayList<Action>();
-			
 		}
-		else{
-			double max = this.getValeur(e);
-			for (Action a : this.getActionsLegales(e)) {
-				if(this.getQValeur(e, a) == max){
-					returnactions.add(a);
-				}
+
+		Double max = this.getValeur(e);
+		for (Action a : this.getActionsLegales(e)) {
+			if (this.getQValeur(e, a) == max) {
+				returnactions.add(a);
 			}
 		}
+
 		return returnactions;
-		
-		
 	}
 	
 	@Override
 	public double getValeur(Etat e) {
-		double max = 0.0;
-		for (Action a : this.getActionsLegales(e)) {
-			max = Math.max(getQValeur(e, a), max);
+
+		Double val = 0.0;
+		HashMap<Action,Double> actions = this.qvaleurs.get(e);
+		if(actions != null){
+			val = actions.entrySet()
+					.stream()
+					.max((entry1, entry2) -> getQValeur(e, entry1.getKey()) > getQValeur(e, entry2.getKey()) ? 1 : -1)
+					.map(Map.Entry::getValue).orElse(0.0);
 		}
-		return max;
-		
+		return val;
 	}
 
 	@Override
@@ -105,14 +107,25 @@ public class QLearningAgent extends RLAgent {
 	
 	@Override
 	public void setQValeur(Etat e, Action a, double d) {
-		this.qvaleurs.get(e).put(a, d);
+		//this.qvaleurs.get(e).put(a, d);
 
 		// mise a jour vmax et vmin pour affichage du gradient de couleur:
 				//vmax est la valeur de max pour tout s de V
 				//vmin est la valeur de min pour tout s de V
 				// ...
-		
-		
+		HashMap<Action, Double> actions = this.qvaleurs.get(e);
+		if(actions != null){
+			actions.put(a, d);
+		}
+		else{
+			HashMap<Action, Double> actionsToPut = new HashMap<>();
+			actionsToPut.put(a, d);
+			this.qvaleurs.put(e, actionsToPut);
+		}
+
+		vmax = Math.max(vmax, d);
+		vmin = Math.min(vmin, d);
+
 		this.notifyObs();
 		
 	}

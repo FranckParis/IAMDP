@@ -1,5 +1,6 @@
 package agent.strategy;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -28,7 +29,7 @@ public class StrategyGreedy extends StrategyExploration{
 	@Override
 	public Action getAction(Etat _e) {//renvoi null si _e absorbant
 		double d =rand.nextDouble();
-		List<Action> actions;
+		List<Action> actions = new ArrayList<>();
 		Action a = null;
 
 		if (this.agent.getActionsLegales(_e).isEmpty()){
@@ -39,9 +40,10 @@ public class StrategyGreedy extends StrategyExploration{
 			actions = this.getAgent().getActionsLegales(_e);
 		}
 		else{
-			actions = this.getAgent().getPolitique(_e);
-			if(actions.isEmpty()){
-				actions = this.getAgent().getActionsLegales(_e);
+			actions = agent.getPolitique(_e);
+//			if(actions.isEmpty()){
+			if(actions == null || actions.isEmpty()){
+				actions = agent.getActionsLegales(_e);
 			}
 		}
 

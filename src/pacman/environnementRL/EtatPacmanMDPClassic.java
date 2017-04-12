@@ -68,7 +68,6 @@ public class EtatPacmanMDPClassic implements Etat , Cloneable{
 			// l'interface Cloneable
 			cnse.printStackTrace(System.err);
 		}
-		
 
 
 		// on renvoie le clone
@@ -80,14 +79,19 @@ public class EtatPacmanMDPClassic implements Etat , Cloneable{
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
+
 		EtatPacmanMDPClassic that = (EtatPacmanMDPClassic) o;
-		return Objects.equals(ghosts, that.ghosts) &&
-				Objects.equals(dots, that.dots) &&
-				Objects.equals(pacmans, that.pacmans);
+
+		if (ghosts != null ? !ghosts.equals(that.ghosts) : that.ghosts != null) return false;
+		if (dots != null ? !dots.equals(that.dots) : that.dots != null) return false;
+		return pacmans != null ? pacmans.equals(that.pacmans) : that.pacmans == null;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(ghosts, dots, pacmans);
+		int result = ghosts != null ? ghosts.hashCode() : 0;
+		result = 31 * result + (dots != null ? dots.hashCode() : 0);
+		result = 31 * result + (pacmans != null ? pacmans.hashCode() : 0);
+		return result;
 	}
 }
